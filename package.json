@@ -1,0 +1,11 @@
+{
+  "name": "matrix-transform",
+  "version": "1.0.0",
+  "description": "",
+  "main": "MatrixTransform.js",
+  "scripts": {
+    "test": "node ./tests.js"
+  },
+  "author": "Evgenii Grebennikov",
+  "license": "ISC"
+}
