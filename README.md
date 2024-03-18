@@ -3,4 +3,4 @@
 - unwrap
 - wrap
 - extrude
-- rotate
+- rotate (box)
