@@ -1,4 +1,4 @@
-const { MatrixTransform, MatrixTransformErrors } = require('./MatrixTransform');
+const { MatrixTransform, MatrixTransformErrors, RotateMetricTypes } = require('./MatrixTransform');
 
 /* TEST */
 var testMatrix = [
@@ -186,9 +186,13 @@ var eightTestMatrix = [
 
 (function () {
     console.log('____________________ rotate _________________')
-    const matrix = new MatrixTransform(testMatrix);
+    const matrix = new MatrixTransform(MatrixTransform.clone(testMatrix));
     const rotatedTo90Matrix = matrix.rotate(.25);
     console.log('rotate to 90 deg:', JSON.stringify(rotatedTo90Matrix) === JSON.stringify([[1, 0, 0, 1], [0, 0, 1, 2], [0, 1, 2, 3], [1, 2, 3, 4]]));
+    
+    const matrix1 = new MatrixTransform(MatrixTransform.clone(testMatrix));
+    const rotatedTo45Matrix = matrix1.rotate(45, RotateMetricTypes.DEGREES);
+    console.log('rotate to 45 deg:', JSON.stringify(rotatedTo45Matrix) === JSON.stringify([[0, 0, 1, 2], [1, 0, 1, 3], [0, 1, 2, 4], [0, 1, 2, 3]]));
 
     // visual tests
 
