@@ -4,6 +4,11 @@ const MatrixTransformErrors = {
     UNDEFINED_EDGE_BORDER: 'the edge border must be defined',
 };
 
+const RotateMetricTypes = {
+    PERCENTAGE: 'percentage',
+    DEGREES: 'degrees',
+};
+
 class MatrixTransform {
     static clone(m) {
         const result = [], ml = m.length;
@@ -161,14 +166,15 @@ class MatrixTransform {
     }
 
     /**
-     * @param {Number} offset [0-1]
+     * @param {Number} offset Default [0-1]
+     * @param {keyof RotateMetricTypes} metrics RotateMetricTypes.PERCENTAGE is default. RotateMetricTypes.DEGREES in degrees
      * @returns 
      */
-    rotate(offset) {
-        const unwrap = MatrixTransform.unwrap(this._matrix);
+    rotate(offset, metrics) {
+        const m = metrics === RotateMetricTypes.DEGREES ? offset / 360 : offset, unwrap = MatrixTransform.unwrap(this._matrix);
         for (let i = 0, l = unwrap.length; i < l; i++) {
             const seq = unwrap[i];
-            let dx = Math.round(offset * seq.length);
+            let dx = Math.round(m * seq.length);
             const dir = Math.sign(dx);
             while (dx) {
                 if (dir === 1) {
@@ -185,7 +191,6 @@ class MatrixTransform {
         }
         const rotatedMatrix = MatrixTransform.wrap(unwrap);
         this._matrix = rotatedMatrix;
-        console.log(this._matrix);
         return this._matrix;
     };
 
@@ -197,4 +202,5 @@ class MatrixTransform {
 module.exports = {
     MatrixTransformErrors,
     MatrixTransform,
+    RotateMetricTypes,
 };
