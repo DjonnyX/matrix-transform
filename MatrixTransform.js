@@ -9,6 +9,11 @@ const RotateMetricTypes = {
     DEGREES: 'degrees',
 };
 
+const MatrixWrapMethods = {
+    BOX: 'box',
+    CIRCLE: 'circle',
+};
+
 class MatrixTransform {
     static clone(m) {
         const result = [], ml = m.length;
@@ -19,8 +24,13 @@ class MatrixTransform {
         return result;
     }
 
-    // not immutable matrix
-    static extractEdgeBorder(m) {
+    /**
+     * not immutable matrix
+     * @param {Array<Array<Number>>} m Matrix
+     * @param {keyof MatrixWrapMethods} method
+     * @returns 
+     */
+    static extractEdgeBorder(m, method = MatrixWrapMethods.BOX) {
         const nm = m, ml = m.length, result = [], lEdge = [], rEdge = [];
         result.push(...(nm.splice(0, 1)).flat());
         for (let i = 0, l1 = ml - 2; i < l1; i++) {
@@ -34,9 +44,14 @@ class MatrixTransform {
         }
         result.push(...lEdge.reverse());
         return result;
-    };
+    }
 
-    static unwrapEdgeBorders(m) {
+    /**
+     * @param {Array<Array<Number>>} m Matrix
+     * @param {keyof MatrixWrapMethods} method
+     * @returns 
+     */
+    static unwrapEdgeBorders(m, method = MatrixWrapMethods.BOX) {
         // new deep immutable matrix
         const nm = MatrixTransform.clone(m), ml = m.length;
 
@@ -47,7 +62,12 @@ class MatrixTransform {
         return result;
     };
 
-    static getEdgeBorderLengthFromMatrix(m) {
+    /**
+     * @param {Array<Array<Number>>} m Matrix
+     * @param {keyof MatrixWrapMethods} method
+     * @returns 
+     */
+    static getEdgeBorderLengthFromMatrix(m, method = MatrixWrapMethods.BOX) {
         if (m.length === 0) {
             return 0;
         }
@@ -57,7 +77,12 @@ class MatrixTransform {
         return m.length * 4 - 4;
     }
 
-    static getNestingSizeFromBorderLength(eb) {
+    /**
+     * @param {Array<Number>>} eb 
+     * @param {keyof MatrixWrapMethods}
+     * @returns 
+     */
+    static getNestingSizeFromBorderLength(eb, method = MatrixWrapMethods.BOX) {
         if (!Array.isArray(eb)) {
             throw new Error(MatrixTransformErrors.UNDEFINED_EDGE_BORDER);
         }
@@ -74,11 +99,12 @@ class MatrixTransform {
     }
 
     /**
-     * @param {Array<Array<Number>>} m 
-     * @param {Array<Number>} eb 
+     * @param {Array<Array<Number>>} m Matrix
+     * @param {Array<Number>} eb Edge border
+     * @param {keyof MatrixWrapMethods} method
      * @returns 
      */
-    static isValidEdgeBorder(m, eb) {
+    static isValidEdgeBorder(m, eb, method = MatrixWrapMethods.BOX) {
         if (!Array.isArray(m)) {
             throw new Error(MatrixTransformErrors.INVALID_MATRIX_TYPE);
         }
@@ -94,10 +120,11 @@ class MatrixTransform {
     }
 
     /**
-     * @param {Array<Array<Number>>} m 
+     * @param {Array<Array<Number>>} m Matrix
+     * @param {keyof MatrixWrapMethods} method
      * @returns 
      */
-    static unwrap(m) {
+    static unwrap(m, method = MatrixWrapMethods.BOX) {
         if (!Array.isArray(m)) {
             throw new Error(MatrixTransformErrors.INVALID_MATRIX_TYPE);
         }
@@ -106,11 +133,12 @@ class MatrixTransform {
     }
 
     /**
-     * @param {Array<Array<Number>>} m 
-     * @param {Array<Number>} eb 
+     * @param {Array<Array<Number>>} m Matrix
+     * @param {Array<Number>} eb Edge border
+     * @param {keyof MatrixWrapMethods} method
      * @returns 
      */
-    static appendEdgeBorder(m, eb) {
+    static appendEdgeBorder(m, eb, method = MatrixWrapMethods.BOX) {
         if (!Array.isArray(m)) {
             throw new Error(MatrixTransformErrors.INVALID_MATRIX_TYPE);
         }
@@ -148,15 +176,16 @@ class MatrixTransform {
 
     /**
      * @param {Array<Array<Number>>} unwrapedMatrix 
+     * @param {keyof MatrixWrapMethods} method
      * @returns 
      */
-    static wrap(unwrapedMatrix) {
+    static wrap(unwrapedMatrix, method = MatrixWrapMethods.BOX) {
         const result = [], um = unwrapedMatrix.reverse();
         for (let i = 0, l = um.length; i < l; i++) {
             MatrixTransform.appendEdgeBorder(result, um[i]);
         }
         return result;
-    };
+    }
 
     /**
      * @param {Array<Array<Number>>} matrix 
@@ -168,9 +197,10 @@ class MatrixTransform {
     /**
      * @param {Number} offset Default [0-1]
      * @param {keyof RotateMetricTypes} metrics RotateMetricTypes.PERCENTAGE is default. RotateMetricTypes.DEGREES in degrees
+     * @param {keyof MatrixWrapMethods} method
      * @returns 
      */
-    rotate(offset, metrics) {
+    rotate(offset, metrics, method = MatrixWrapMethods.BOX) {
         const m = metrics === RotateMetricTypes.DEGREES ? offset / 360 : offset, unwrap = MatrixTransform.unwrap(this._matrix);
         for (let i = 0, l = unwrap.length; i < l; i++) {
             const seq = unwrap[i];
@@ -192,7 +222,7 @@ class MatrixTransform {
         const rotatedMatrix = MatrixTransform.wrap(unwrap);
         this._matrix = rotatedMatrix;
         return this._matrix;
-    };
+    }
 
     toString() {
         return !!this._matrix ? this._matrix.toString() : undefined;
