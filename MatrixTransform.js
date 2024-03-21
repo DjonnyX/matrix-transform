@@ -263,7 +263,7 @@ class MatrixTransform {
     rotate(offset, metrics, options = { method: MatrixWrapMethods.BOX, antialiasing: 0 }) {
         const m = metrics === RotateMetricTypes.DEGREES ? offset / 360 : offset, unwrap = MatrixTransform.unwrap(this._matrix, options.method);
 
-        switch (method) {
+        switch (options.method) {
             case MatrixWrapMethods.CIRCLE: {
                 // etc
                 return this._matrix;
