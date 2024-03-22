@@ -10,12 +10,21 @@ const RotateMetricTypes = {
 };
 
 const MatrixWrapMethods = {
+    /**
+     * Данный метод работает быстрее, чем MatrixWrapMethods.CIRCLE, но выдает дисторцию на гипотенузах между центром и углами, если угол поворота не кратен 90.
+     * Целесообразно использовать при поворотах на 90, 180, 270 и 360 градусов.
+     */
     BOX: 'box',
+    /**
+     * Not implemented
+     * Данный метод используется для поворота матрицы на не прямой угол.
+     * Требуется альязинг соседних пикселей
+     */
     CIRCLE: 'circle',
 };
 
 /**
- * Cicle method not implemented
+ * Circle method not implemented
  */
 class MatrixTransform {
     static clone(m) {
@@ -89,7 +98,6 @@ class MatrixTransform {
      * @returns 
      */
     static getEdgeBorderLengthFromMatrix(m, method = MatrixWrapMethods.BOX) {
-
         switch (method) {
             case MatrixWrapMethods.CIRCLE: {
                 // etc
@@ -261,15 +269,29 @@ class MatrixTransform {
      * @returns 
      */
     rotate(offset, metrics, options = { method: MatrixWrapMethods.BOX, antialiasing: 0 }) {
-        const m = metrics === RotateMetricTypes.DEGREES ? offset / 360 : offset, unwrap = MatrixTransform.unwrap(this._matrix, options.method);
+        const m = metrics === RotateMetricTypes.DEGREES ? offset / 360 : offset;
 
         switch (options.method) {
             case MatrixWrapMethods.CIRCLE: {
                 // etc
+                // - добавляется паддинг равный разнице гипотенузы между центром и вершиной квадрата/прямоугольника и стороной матрицы
+                // - достраивается матрица до квадрата и заполняет достроенную область маркером E (empty)
+                // - Экстрагируется радиальная развертка
+                // - трансформация на заданный угол
+                // - интерполяция соседних пикселей заданная значением, +вычисление от парогового значения разности "высот"
+                // - кроп по маркерам E
+                // - преобразование маркеров E в альфа-канал
                 return this._matrix;
             }
             case MatrixWrapMethods.BOX:
             default: {
+                // - добавляется паддинг равный разнице гипотенузы между центром и вершиной квадрата/прямоугольника и стороной матрицы
+                // - достраивается матрица до квадрата и заполняет достроенную область маркером E (empty)
+
+                // экстрагируется квадратная развертка
+                const unwrap = MatrixTransform.unwrap(this._matrix, MatrixWrapMethods.BOX);
+
+                // Поворот развертки
                 for (let i = 0, l = unwrap.length; i < l; i++) {
                     const seq = unwrap[i];
                     let dx = Math.round(m * seq.length);
@@ -287,6 +309,11 @@ class MatrixTransform {
                         dx -= dir;
                     }
                 }
+
+                // - Нахождение границ по маркерам E. Кроп по маркерам E
+                // - преобразование маркеров E в альфа-канал
+
+                // Преобразование развертки в матрицу
                 const rotatedMatrix = MatrixTransform.wrap(unwrap);
                 this._matrix = rotatedMatrix;
                 return this._matrix;

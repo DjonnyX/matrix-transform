@@ -1,4 +1,4 @@
-const { MatrixTransform, MatrixTransformErrors, RotateMetricTypes } = require('./MatrixTransform');
+const { MatrixTransform, MatrixTransformErrors, RotateMetricTypes, MatrixWrapMethods } = require('./MatrixTransform');
 
 /* TEST */
 var testMatrix = [
@@ -189,7 +189,7 @@ var eightTestMatrix = [
     const matrix = new MatrixTransform(MatrixTransform.clone(testMatrix));
     const rotatedTo90Matrix = matrix.rotate(.25);
     console.log('rotate to 90 deg:', JSON.stringify(rotatedTo90Matrix) === JSON.stringify([[1, 0, 0, 1], [0, 0, 1, 2], [0, 1, 2, 3], [1, 2, 3, 4]]));
-    
+
     const matrix1 = new MatrixTransform(MatrixTransform.clone(testMatrix));
     const rotatedTo45Matrix = matrix1.rotate(45, RotateMetricTypes.DEGREES);
     console.log('rotate to 45 deg:', JSON.stringify(rotatedTo45Matrix) === JSON.stringify([[0, 0, 1, 2], [1, 0, 1, 3], [0, 1, 2, 4], [0, 1, 2, 3]]));
@@ -200,3 +200,52 @@ var eightTestMatrix = [
     // rotatedTo90Matrix (after)
     // В другой раз)
 })();
+
+// (function () {
+//     console.log('____________________ MatrixWrapMethods.CIRCLE 90 _________________')
+//     const matrixRect = [
+//         [1, 2, 3, 4, 5, 6],
+//         [0, 1, 2, 3, 4, 5],
+//         [0, 0, 1, 2, 3, 4],
+//         [1, 0, 0, 1, 2, 3]
+//     ];
+//     const expectedMatrix = [
+//         [1, 0, 0, 1],
+//         [0, 0, 1, 2],
+//         [0, 1, 2, 3],
+//         [1, 2, 3, 4],
+//         [2, 3, 4, 5],
+//         [3, 4, 5, 6]
+//     ];
+//     const matrix = new MatrixTransform(MatrixTransform.clone(matrixRect));
+//     const rotatedTo90Matrix = matrix.rotate(90, RotateMetricTypes.DEGREES, { method: MatrixWrapMethods.CIRCLE });
+//     console.log('rotate to 90 deg:', JSON.stringify(rotatedTo90Matrix) === JSON.stringify(expectedMatrix));
+// })();
+
+// (function () {
+//     console.log('____________________ MatrixWrapMethods.CIRCLE 45 _________________')
+//     const matrixRect = [
+//         [1, 2, 3, 4, 5, 6],
+//         [0, 1, 2, 3, 4, 5],
+//         [0, 0, 1, 2, 3, 4],
+//         [1, 0, 0, 1, 2, 3]
+//     ];
+//     const expectedMatrix = [
+//         [1, 0, 0, 1],
+//         [0, 0, 1, 2],
+//         [0, 1, 2, 3],
+//         [1, 2, 3, 4],
+//         [2, 3, 4, 5],
+//         [3, 4, 5, 6]
+//     ];
+
+//     // [A, A, A, 1, 2, A, A]
+//     // [A, 0, 0, 1, 3, 4, A]
+//     // [1, 0, 1, 2, 2, 3, 5]
+//     // [A, A, A, 1, 3, 4, 6]
+//     // [A, A, A, 1, 4, 5, A]
+//     // [A, A, 1, 2, 3, A, A]
+//     const matrix = new MatrixTransform(MatrixTransform.clone(matrixRect));
+//     const rotatedTo90Matrix = matrix.rotate(90, RotateMetricTypes.DEGREES, { method: MatrixWrapMethods.CIRCLE });
+//     console.log('rotate to 90 deg:', JSON.stringify(rotatedTo90Matrix) === JSON.stringify(expectedMatrix));
+// })();
